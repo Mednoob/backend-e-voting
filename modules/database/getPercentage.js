@@ -1,11 +1,11 @@
 import { getVotePercentage } from "../non-database/getVotePercentage.js";
-import { Vote } from "../../models/Vote.js";
+import { UserData } from "../../models/UserData.js";
 
 /*  getPercentage - Fungsi yang digunakan untuk mengambil data persentase suara untuk
     digunakan oleh `getVotePercentage`.
 
     Di atas sudah diimport fungsi `getVotePercentage` dan
-    model `Vote` yang akan digunakan untuk mengambil data.
+    model `UserData` yang akan digunakan untuk mengambil data.
 
     Fungsi mengembalikan hasil dari `getVotePercentage`.
 

@@ -32,7 +32,7 @@ export async function parseExcelFile(file) {
                 class: clas,
                 name,
                 nis,
-                voted: false
+                vote: null
             });
         });
     }
