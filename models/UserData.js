@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, ModelStatic } from "sequelize";
 import { db } from "../index.js";
 
 /**
@@ -6,12 +6,14 @@ import { db } from "../index.js";
  * @property {number} nis
  * @property {string} name
  * @property {string} class
- * @property {boolean} voted
+ * @property {number | null} vote
  * 
  * @typedef {UserBase & Model} UserModel
  */
 
-
+/**
+ * @type {ModelStatic<UserModel>}
+ */
 export const UserData = db.define("userdata", {
     nis: {
         type: DataTypes.NUMBER,
@@ -25,8 +27,8 @@ export const UserData = db.define("userdata", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    voted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false
+    vote: {
+        type: DataTypes.NUMBER,
+        allowNull: true
     }
 });
