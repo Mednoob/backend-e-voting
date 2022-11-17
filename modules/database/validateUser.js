@@ -21,7 +21,7 @@ import { UserData } from "../../models/UserData.js";
 
 // Abaikan bagian yang berisi @param dan @returns
 /**
- * @param {{ nis: number, name: string, class: string }} data
+ * @param {{ nis: number, name: string }} data
  * @returns {{ valid: boolean, message: string }}
  */
 export async function validateUser(data) {
