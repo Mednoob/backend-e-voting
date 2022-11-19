@@ -1,19 +1,13 @@
-import { getVotePercentage } from "../non-database/getVotePercentage.js";
 import { UserData } from "../../models/UserData.js";
-
-/*  getPercentage - Fungsi yang digunakan untuk mengambil data persentase suara untuk
-    digunakan oleh `getVotePercentage`.
-
-    Di atas sudah diimport fungsi `getVotePercentage` dan
-    model `UserData` yang akan digunakan untuk mengambil data.
-
-    Fungsi mengembalikan hasil dari `getVotePercentage`.
-
-    Beberapa hal yang bisa dicari untuk penyelesaian:
-    - async/await
-    - Cara mengambil data menggunakan model sequelize
-*/
+import { QueryTypes } from "sequelize";
 
 export async function getPercentage() {
-    
+    const res = await UserData.sequelize.query(`SELECT vote, round(
+        COUNT(*) * 100.0 / (SELECT COUNT(*) FROM userdata WHERE vote is NOT NULL), 2
+    ) FROM userdata WHERE vote IS NOT NULL GROUP BY vote;
+    `, {
+        type: QueryTypes.SELECT
+    });
+
+    return res;
 }

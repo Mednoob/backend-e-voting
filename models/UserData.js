@@ -1,5 +1,4 @@
-import { DataTypes, Model, ModelStatic } from "sequelize";
-import { db } from "../index.js";
+import { DataTypes, Model } from "sequelize";
 
 /**
  * @typedef {Object} UserBase
@@ -12,9 +11,9 @@ import { db } from "../index.js";
  */
 
 /**
- * @type {ModelStatic<UserModel>}
+ * @type {import("sequelize").ModelStatic<UserModel>}
  */
-export const UserData = db.define("userdata", {
+export const UserData = globalThis.db.define("userdata", {
     nis: {
         type: DataTypes.NUMBER,
         primaryKey: true
@@ -31,4 +30,6 @@ export const UserData = db.define("userdata", {
         type: DataTypes.NUMBER,
         allowNull: true
     }
+}, {
+    timestamps: false
 });

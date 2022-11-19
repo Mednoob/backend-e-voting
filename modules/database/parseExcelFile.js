@@ -1,5 +1,7 @@
-import { UserData, UserBase } from "../../models/UserData.js";
-import { Workbook } from "exceljs";
+import { UserData } from "../../models/UserData.js";
+import excel from "exceljs";
+
+const { Workbook } = excel;
 
 /**
  * @param {Buffer} file
@@ -8,26 +10,26 @@ export async function parseExcelFile(file) {
     const workbook = new Workbook();
 
     /**
-     * @type {UserBase[]}
+     * @type {import("../../models/UserData").UserBase[]}
      */
     const res = [];
 
     await workbook.xlsx.load(file);
 
-    for (const sheet of workbook.worksheets) {
+    workbook.eachSheet(sheet => {
         let clas = "";
 
         sheet.getColumn("A").eachCell((cell, rownum) => {
-            const val = cell.value.toString();
+            const val = String(cell.value);
             if (isNaN(val)) {
-                if (val.toLowerCase().startsWith("kelas")) {
-                    clas = ((/^kelas\s*:\s*(.+)$/).exec(val) || [, ""])[1];
-                }
+                const exec = (/^kelas\s*:\s*(.+)$/i).exec(val);
+                if (exec) clas = exec[1];
 
                 return;
             }
 
-            const [, nis, name] = sheet.getRow(rownum).values;
+            const values = sheet.getRow(rownum).values;
+            const [, , nis, name] = values;
             res.push({
                 class: clas,
                 name,
@@ -35,7 +37,7 @@ export async function parseExcelFile(file) {
                 vote: null
             });
         });
-    }
+    })
 
     await UserData.bulkCreate(res, { ignoreDuplicates: true });
 }
