@@ -1,47 +1,66 @@
-/**
- * Penempatan server express
- * 
- * Tugas dari bagian server adalah untuk mengelola endpoint yang akan digunakan oleh front-end
- * dan menerima data dari front-end (seperti file excel, JSON, dsb).
- * 
- * Beberapa hal yang bisa dicari untuk penyelesaian:
- * - Cara membuat server sederhana dengan express
- * - Body parser untuk express
- * - Library untuk mengambil file hasil upload contoh: multer
- */
+import { getPercentage } from "../database/getPercentage.js";
+import { saveVote } from "../database/saveVote.js";
 import bodyParser from "body-parser";
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
+app.use(cors());
 
-// To do: integrasi dengan fungsi getPercentage yang ada di file modules\database\getPercentage.js
+// Request Logger
+app.use((req, res, next) => {
+    console.log(`[${new Date()}] ${req.method} ${req.path}`);
+    next();
+})
+
 app.get('/vote-percentage', async (req,res) => {
-    const server_user_data = {
-        nis: req.body.nis,
-        name: req.body.name,
-        class: req.body.class,
-        voted: req.body.voted
-    }
-    res.status(200).json([{
-        data: server_user_data
-    }])
+    res.status(200).json(await getPercentage());
 })
 
-// To do: integrasi dengan fungsi saveVote yang ada di file modules/database/saveVote.js
-app.post('/vote', async (req, res) =>{
-    const vote = {
-        id: req.body.id,
-        time: req.body.time,
-        vote: req.body.vote
+app.post('/vote', (req, res, next) => {
+    try {
+        const decoded = Buffer.from(req.headers.authorization.split(" ")[1], "base64").toString("utf-8");
+        if (!(/^e-vote-logged-in-\d+$/).test(decoded)) throw new Error();
+
+        next()
+    } catch {
+        res.status(401).json({
+            valid: false,
+            message: "Anda belum login. Silahkan minta admin untuk login."
+        })
     }
-    res.status(200).json([{
-        data: vote
-   }])
+}, async (req, res) => {
+    const obj = await saveVote(req.body);
+    res.status(obj.valid ? 200 : 400).json(obj);
 })
+
+app.post('/login', (req, res) => {
+    // Low-level security, yes. Karena udah mepet deadline.
+    try {
+        const decoded = Buffer.from(req.body.password, 'base64').toString('ascii');
+        const dExec = (/^e-vote-(\d+)$/).exec(decoded);
+        if (!dExec) throw new Error();
+
+        const [, num] = (/^komputer(\d+)$/).exec(req.body.username);
+        if (num !== dExec[1]) throw new Error();
+
+        res.status(200).json({
+            valid: true,
+            token: Buffer.from(`e-vote-logged-in-${num}`).toString('base64'),
+            displayName: `Komputer ${num}`
+        });
+    } catch {
+        res.status(401).json({
+            valid: false,
+            token: null,
+            displayName: null
+        });
+    }
+});
 
 app.get('/', (req, res) => {
     res.send('Testing!');
@@ -49,4 +68,4 @@ app.get('/', (req, res) => {
 
 app.listen(port, (req, res) => {
     console.log(`Your server is running in port ${port}`)
-})
+});
