@@ -17,6 +17,11 @@ export async function saveVote(data) {
             valid: false,
             message: "Nama tidak sesuai dengan data yang ada di database"
         };
+    } else if (data.context === "mpk" && !user.allowmpk) {
+        return {
+            valid: false,
+            message: "Anda tidak berhak untuk mengikuti pemilihan MPK"
+        }
     } else if (user.vote !== null) {
         return {
             valid: false,
