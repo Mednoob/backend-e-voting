@@ -6,6 +6,7 @@ import { DataTypes, Model } from "sequelize";
  * @property {string} name
  * @property {string} class
  * @property {number | null} vote
+ * @property {boolean} allowmpk
  * 
  * @typedef {UserBase & Model} UserModel
  */
@@ -29,6 +30,10 @@ export const UserData = globalThis.db.define("userdata", {
     vote: {
         type: DataTypes.NUMBER,
         allowNull: true
+    },
+    allowmpk: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
     }
 }, {
     timestamps: false
