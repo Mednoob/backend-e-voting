@@ -2,7 +2,7 @@ import { UserData } from "../../models/UserData.js";
 import { QueryTypes } from "sequelize";
 
 export async function getPercentage() {
-    const res = await UserData.sequelize.query(`SELECT vote, round(
+    const res = await UserData.sequelize.query(`SELECT vote, COUNT(*) as 'count', round(
         COUNT(*) * 100.0 / (SELECT COUNT(*) FROM userdata WHERE vote is NOT NULL), 2
     ) AS percentage FROM userdata WHERE vote IS NOT NULL GROUP BY vote;
     `, {
@@ -10,7 +10,10 @@ export async function getPercentage() {
     });
 
     return res.reduce((p, c) => {
-        p[c.vote] = +c.percentage;
+        p[c.vote] = {
+            persentase: `${c.percentage}%`,
+            total: +c.count
+        };
         return p;
     }, {});
 }
