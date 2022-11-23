@@ -4,8 +4,8 @@ import { UserData } from "../../models/UserData.js";
  * @param {{ nis: number, name: string, vote: number }} data
  */
 export async function saveVote(data) {
-    // Mengambil data user berdasarkan nis
     const user = await UserData.findOne({ where: { nis: data.nis } });
+    const context = data.context === "mpk" ? "mpk" : "osis";
 
     if (!user) {
         return {
@@ -17,19 +17,21 @@ export async function saveVote(data) {
             valid: false,
             message: "Nama tidak sesuai dengan data yang ada di database"
         };
-    } else if (data.context === "mpk" && !user.allowmpk) {
+    } else if (
+        (context === "mpk" && !user.allowmpk) ||
+        (context !== "mpk" && user.disallowosis)
+    ) {
         return {
             valid: false,
-            message: "Anda tidak berhak untuk mengikuti pemilihan MPK"
-        }
-    } else if (user.vote !== null) {
+            message: `Anda tidak berhak untuk mengikuti pemilihan ${context.toUpperCase()}`
+        };
+    } else if (user[`${context}vote`] !== null) {
         return {
             valid: false,
             message: "Anda sudah pernah melakukan voting"
         };
     }
 
-    // Mengubah value `vote` menjadi `data.vote`
-    await user.update({ vote: data.vote });
+    await user.update({ [`${context}vote`]: data.vote });
     return { valid: true, message: null };
 }
