@@ -5,8 +5,10 @@ import { DataTypes, Model } from "sequelize";
  * @property {number} nis
  * @property {string} name
  * @property {string} class
- * @property {number | null} vote
+ * @property {number | null} mpkvote
  * @property {boolean} allowmpk
+ * @property {boolean} disallowosis
+ * @property {number | null} osisvote
  * 
  * @typedef {UserBase & Model} UserModel
  */
@@ -27,13 +29,21 @@ export const UserData = globalThis.db.define("userdata", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    vote: {
+    mpkvote: {
         type: DataTypes.NUMBER,
         allowNull: true
     },
     allowmpk: {
         type: DataTypes.BOOLEAN,
         allowNull: false
+    },
+    disallowosis: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+    },
+    osisvote: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true
     }
 }, {
     timestamps: false
