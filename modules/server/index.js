@@ -17,7 +17,20 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get('/vote-percentage', async (req,res) => {
+app.get('/vote-percentage', (req, res, next) => {
+    try {
+        const decoded = Buffer.from(req.headers.authorization.split(" ")[1], "base64").toString("ascii");
+        const [, num] = (/^e-vote-logged-in-(\d+)$/).exec(decoded);
+
+        if (num !== "0") throw new Error();
+        next();
+    } catch {
+        res.status(401).json({
+            valid: false,
+            message: "Kamu tidak memiliki akses untuk membuka halaman ini"
+        });
+    }
+}, async (req,res) => {
     res.status(200).json(await getPercentage());
 })
 
